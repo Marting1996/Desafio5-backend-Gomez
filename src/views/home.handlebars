@@ -1,0 +1,139 @@
+<h2>Products</h2>
+
+<form id="form">
+    Limit: <input type="number" id="query-limit" value="{{limit}}"> <br>
+    Page: <input type="number" id="page-limit" value="{{page}}"> <br>
+    <select id="query-category">
+        <option value="">Categorias</option>
+        <option value="frutas" {{#if categoryEquals }}selected{{/if}}>Frutas</option>
+        <option value="verduras" {{#if categoryEquals }}selected{{/if}}>Verduras</option>
+    </select> <br>
+    Sort by:
+    <select id="query-sort">
+        <option value="">None</option>
+        <option value="price" {{#if sortEquals }}selected{{/if}}>Price</option>
+    </select> <br>
+    <br>
+    <button type="submit">Load</button>
+
+</form>
+
+<table border="1">
+    <thead>
+        <tr>
+            <td>ID</td>
+            <td>Title</td>
+            <td>Description</td>
+            <td>Price</td>
+            <td>Cantidad</td>
+            <td>ID del carrito</td>
+            <td>Ver Producto</td>
+        </tr>
+    </thead>
+    <tbody>
+        {{#each docs}}
+        <tr>
+            <td>{{this._id}}</td>
+            <td>{{this.title}}</td>
+            <td>{{this.description}}</td>
+            <td>{{this.price}}</td>
+            <td>
+                <input type="text" id="cartId_{{this._id}}" placeholder="ID del carrito">
+            </td>
+            <td>
+                <button onclick="addToCart('{{this._id}}')">Add to Cart</button>
+            </td>
+            <td>
+                <button onclick="getProduct('{{this._id}}')">Get product</button>
+            </td>
+        </tr>
+        {{/each}}
+    </tbody>
+</table>
+<div>
+        {{#if hasPrevPage }}
+        <a href="/api/products{{prevLink}}">Anteriot</a>
+        {{/if}}
+        {{#if hasNextPage }}
+        <a href="/api/products{{nextLink}}">Siguiente</a>
+        {{/if}}
+</div>
+<script>
+    document.getElementById("form").onsubmit = (e) => {
+        e.preventDefault();
+        const limit = document.getElementById("query-limit").value;
+        const page = document.getElementById("page-limit").value;
+        const category = document.getElementById("query-category").value;
+        const sort = document.getElementById("query-sort").value;
+
+        let url = `/api/products?limit=${limit}&page=${page}`;
+        if (category) {
+            url += `&category=${category}`;
+        }
+        if (sort) {
+            url += `&sort=${sort}`;
+        }
+
+        window.location.href = url;
+
+    }
+</script>
+
+<script>
+    async function addToCart(pid) {
+        const cartId = document.getElementById(`cartId_${pid}`).value; 
+
+        if (!cartId) {
+            console.error("Debes proporcionar el ID del carrito.");
+            return;
+        }
+
+        fetch(`/api/carts/${cartId}/product/${pid}`, {
+            method: "GET"
+        })
+        .then(response => {
+            if (response.ok) {
+                console.log("Producto agregado al carrito correctamente");
+            } else {
+                console.error("Error al agregar el producto al carrito:");
+            }
+        })
+        .catch(error => {
+            console.error("Error al agregar el producto al carrito:", error);
+        });
+    }
+</script>
+
+<script>
+    async function createCart() {
+        fetch("/api/carts", {
+            method: "POST"
+        })
+        .then(response => {
+            if (response.ok) {
+                console.log("Carrito creado correctamente");
+                return response.json(); 
+            } else {
+                console.error("Error al crear el carrito:");
+            }
+        })
+        .then(data => {
+            console.log("Datos de los carritos:", data);
+        })
+        .catch(error => {
+            console.error("Error al crear el carrito:", error);
+        });
+    }
+</script>
+<script>
+    async function getProduct(pid) {
+        const productId = pid;
+
+        if (!productId) {
+            console.error("Debes proporcionar el ID del producto.");
+            return;
+        }
+
+        window.location.href = `/api/products/${productId}`;
+    }
+</script>

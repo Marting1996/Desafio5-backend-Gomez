@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <form action="/api/session/logout" method="post">
+        <button type="submit">Cerrar sesión</button>
+    </form>
+    <ul>
+    <li>
+        <a href="/realtimeproducts">Create products</a>
+    </li>
+    <li>
+        <a href="/api/carts">Carts</a>
+    </li>
+    <li>
+        <a href="/chat">Chat</a>
+    </li>
+    <li>
+        <a href="/api/session/register">Registrarse</a>
+    </li>
+    <li>
+        <a href="/api/session/login">Inicia sesion</a>
+    </li>
+    <li>
+        <a href="/api/session/profile">Perfil</a>
+    </li>
+    
+</ul>
+    {{#if message}}
+    <div class="welcome-message">
+        {{message}}
+    </div>
+    {{/if}}
+    {{{ body }}}
+</body>
+</html>
